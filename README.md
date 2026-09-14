@@ -33,13 +33,6 @@ Once deployed, GitHub Pages gives you a free live link you can share with anyone
 
 **[Link for Live Demo](https://charmanderthegreat.github.io/Spin-the-wheel-movie-version/)**
 
-**[Link for Live Demo](https://charmanderthegreat.github.io/Spin-the-wheel-movie-version/)**
-
-**[Link for Live Demo](https://charmanderthegreat.github.io/Spin-the-wheel-movie-version/)**
-
-**[Link for Live Demo](https://charmanderthegreat.github.io/Spin-the-wheel-movie-version/)**
-
-**[Link for Live Demo](https://charmanderthegreat.github.io/Spin-the-wheel-movie-version/)**
 
 ## Deploying to GitHub Pages
 

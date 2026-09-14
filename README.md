@@ -31,7 +31,7 @@ No installation needed — it's a single HTML file.
 
 Once deployed, GitHub Pages gives you a free live link you can share with anyone — no hosting costs, no setup on their end. Just send them the URL and they can use the app straight from their browser.
 
-**[Link for Live Demo](https://charmanderthegreat.github.io/Spin-the-wheel-movie-version/)**
+**[Link for Live Demo](https://charmanderthegreat.github.io/movie-wheel/)**
 
 
 ## Deploying to GitHub Pages

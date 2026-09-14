@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reel Roulette — Movie Picker</title>
 <style>
-  @font-face {
-    font-family: 'Marquee';
-  }
   :root{
     --bg: #0d0b0a;
     --bg-warm: #171210;
@@ -58,7 +55,7 @@
   }
 
   .wrap{
-    max-width: 900px;
+    max-width: 780px;
     margin: 0 auto;
     padding: 48px 48px 80px;
   }
@@ -195,48 +192,36 @@
   .result{
     display:none;
     margin: 36px auto 0;
-    max-width: 480px;
+    max-width: 420px;
     background: var(--bg-warm);
     border: 1px solid var(--line);
     border-radius: 10px;
-    overflow:hidden;
+    padding: 26px 24px;
+    text-align:center;
     box-shadow: 0 18px 40px rgba(0,0,0,0.5);
   }
-  .result.show{ display:flex; }
-  .result img{
-    width: 140px;
-    height: 210px;
-    object-fit: cover;
-    flex-shrink:0;
-    background: #2a251f;
-  }
-  .result-body{
-    padding: 20px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    gap:10px;
-  }
+  .result.show{ display:block; }
   .result-label{
     font-family: Georgia, serif;
     font-style: italic;
     color: var(--gold);
-    font-size: 0.85rem;
-    margin:0;
+    font-size: 0.9rem;
+    margin:0 0 8px;
   }
   .result-title{
     font-family: Georgia, serif;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight:700;
     margin:0;
-    line-height:1.2;
+    line-height:1.25;
   }
   .result a{
+    display:inline-block;
+    margin-top: 14px;
     color: var(--red-bright);
     text-decoration:none;
     font-size: 0.92rem;
     border-bottom: 1px solid var(--red-bright);
-    align-self:flex-start;
   }
   .result a:hover{ color: var(--gold-bright); border-color: var(--gold-bright); }
 
@@ -268,16 +253,10 @@
     font-size: 0.88rem;
     margin: 0 0 22px;
   }
-  section.manage .hint code{
-    color: var(--gold);
-    background: rgba(201,162,74,0.1);
-    padding: 1px 6px;
-    border-radius:4px;
-  }
 
   .add-form{
     display:grid;
-    grid-template-columns: 1fr 1fr auto;
+    grid-template-columns: 1fr auto;
     gap: 10px;
     margin-bottom: 28px;
   }
@@ -288,10 +267,11 @@
     background: var(--bg-warm);
     border: 1px solid var(--line);
     color: var(--paper);
-    padding: 12px 14px;
+    padding: 13px 14px;
     border-radius: 6px;
     font-family: 'Courier New', monospace;
     font-size: 0.95rem;
+    width: 100%;
   }
   .add-form input:focus{
     outline:none;
@@ -302,170 +282,52 @@
     color: #1c1815;
     border:none;
     font-weight:700;
-    padding: 12px 24px;
+    padding: 13px 26px;
     border-radius: 6px;
     cursor:pointer;
     font-family: Georgia, serif;
   }
   .add-form button:hover{ background: var(--gold-bright); }
 
-  .search-box{
-    position: relative;
-    margin-bottom: 28px;
-  }
-  .search-box input{
-    width:100%;
-    background: var(--bg-warm);
-    border: 1px solid var(--line);
-    color: var(--paper);
-    padding: 14px 16px;
-    border-radius: 6px;
-    font-family: 'Courier New', monospace;
-    font-size: 1rem;
-  }
-  .search-box input:focus{
-    outline:none;
-    border-color: var(--gold);
-  }
-  .search-results{
-    display:none;
-    position: absolute;
-    top: calc(100% + 6px);
-    left:0; right:0;
-    background: var(--bg-warm);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    max-height: 360px;
-    overflow-y: auto;
-    z-index: 10;
-    box-shadow: 0 14px 30px rgba(0,0,0,0.5);
-  }
-  .search-results.show{ display:block; }
-  .search-results .row{
-    display:flex;
-    align-items:center;
-    gap: 12px;
-    padding: 10px 12px;
-    cursor:pointer;
-    border-bottom: 1px solid var(--line);
-  }
-  .search-results .row:last-child{ border-bottom:none; }
-  .search-results .row:hover{ background: rgba(201,162,74,0.1); }
-  .search-results .row img{
-    width: 40px;
-    height: 60px;
-    object-fit:cover;
-    border-radius: 4px;
-    flex-shrink:0;
-    background: #2a251f;
-  }
-  .search-results .row .meta{
-    flex:1;
-    min-width:0;
-  }
-  .search-results .row .meta .t{
-    font-size: 0.92rem;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-  }
-  .search-results .row .meta .y{
-    font-size: 0.78rem;
-    color:#8a7d69;
-  }
-  .search-results .row .added{
-    font-size: 0.75rem;
-    color: #6bb56b;
-    font-style: italic;
-    flex-shrink:0;
-  }
-  .search-results .no-key-note{
-    padding: 14px;
-    color:#a89c8a;
-    font-size:0.85rem;
-    font-style:italic;
-    font-family: Georgia, serif;
-  }
-
-  .api-key-row{
-    display:flex;
-    gap:10px;
-    margin-bottom: 24px;
-    align-items:center;
-    flex-wrap:wrap;
-  }
-  .api-key-row input{
-    flex:1;
-    min-width: 200px;
-    background: var(--bg-warm);
-    border: 1px solid var(--line);
-    color: var(--paper);
-    padding: 10px 12px;
-    border-radius: 6px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-  }
-  .api-key-row a{ color: var(--gold); font-size: 0.82rem; }
-  .status-dot{
-    width:9px; height:9px;
-    border-radius:50%;
-    background: #6b6156;
-    flex-shrink:0;
-  }
-  .status-dot.ok{ background: #6bb56b; }
-
   .list{
-    display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 16px;
+    display:flex;
+    flex-direction:column;
+    gap: 8px;
   }
   .card{
     background: var(--bg-warm);
     border: 1px solid var(--line);
     border-radius: 8px;
-    overflow:hidden;
-    position:relative;
-  }
-  .card img{
-    width:100%;
-    aspect-ratio: 2/3;
-    object-fit:cover;
-    display:block;
-    background: #2a251f;
-  }
-  .card .placeholder{
-    width:100%;
-    aspect-ratio:2/3;
+    padding: 12px 14px;
     display:flex;
     align-items:center;
-    justify-content:center;
-    color:#6b6156;
-    font-size:0.75rem;
-    text-align:center;
-    padding:8px;
-    font-family: Georgia, serif;
+    justify-content:space-between;
+    gap: 12px;
   }
   .card .name{
-    padding: 8px 10px 10px;
-    font-size: 0.82rem;
-    line-height:1.3;
+    font-size: 0.95rem;
   }
   .card .remove{
-    position:absolute;
-    top:6px; right:6px;
-    width:24px; height:24px;
+    width:26px; height:26px;
     border-radius:50%;
-    background: rgba(20,15,12,0.85);
+    background: transparent;
     color: var(--red-bright);
     border: 1px solid var(--red-bright);
     cursor:pointer;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     line-height:1;
     display:flex;
     align-items:center;
     justify-content:center;
+    flex-shrink:0;
   }
   .card .remove:hover{ background: var(--red-bright); color: var(--bg); }
+  .list-empty{
+    color:#6b6156;
+    font-style:italic;
+    font-family: Georgia, serif;
+    font-size: 0.92rem;
+  }
 
   footer{
     text-align:center;
@@ -508,34 +370,22 @@
   </div>
 
   <div class="result" id="result">
-    <img id="resultImg" src="" alt="">
-    <div class="result-body">
-      <p class="result-label">Tonight you're watching</p>
-      <p class="result-title" id="resultTitle"></p>
-      <a id="resultLink" href="#" target="_blank" rel="noopener">Open link →</a>
-    </div>
+    <p class="result-label">Tonight you're watching</p>
+    <p class="result-title" id="resultTitle"></p>
+    <a id="resultLink" href="#" target="_blank" rel="noopener" style="display:none;">Open link →</a>
   </div>
 
   <div class="film-divider"></div>
 
   <section class="manage">
     <h2>Your Watchlist</h2>
-    <p class="hint">
-      Search pulls from the full TMDB movie database — posters included. Get a free key at
-      <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener" style="color:var(--gold)">themoviedb.org</a>
-      (takes a minute, no card needed), paste it below, then search any title.
-    </p>
+    <p class="hint">Type a movie name, add an optional link, then click Add.</p>
 
-    <div class="api-key-row">
-      <span class="status-dot" id="keyDot"></span>
-      <input type="text" id="apiKeyInput" placeholder="Paste your TMDB API key (v3 auth) here">
-      <button class="spin-btn" style="margin:0; padding:10px 20px; font-size:0.85rem;" id="saveKeyBtn">Save Key</button>
-    </div>
-
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Search the movie database… e.g. Spirited Away" autocomplete="off">
-      <div class="search-results" id="searchResults"></div>
-    </div>
+    <form class="add-form" id="addForm">
+      <input type="text" id="titleInput" placeholder="Movie title (e.g. Spirited Away)" required>
+      <input type="url" id="linkInput" placeholder="Link to watch (optional)">
+      <button type="submit">Add</button>
+    </form>
 
     <div class="list" id="list"></div>
   </section>
@@ -545,32 +395,24 @@
 
 <script>
 (function(){
-  const STORAGE_KEY = 'reelRoulette_movies';
-  const API_KEY_STORAGE = 'reelRoulette_tmdbKey';
+  const STORAGE_KEY = 'reelRoulette_movies_simple';
 
   const listEl = document.getElementById('list');
   const wheelEl = document.getElementById('wheel');
   const spinBtn = document.getElementById('spinBtn');
   const emptyNote = document.getElementById('emptyNote');
-  const searchInput = document.getElementById('searchInput');
-  const searchResults = document.getElementById('searchResults');
-  const apiKeyInput = document.getElementById('apiKeyInput');
-  const saveKeyBtn = document.getElementById('saveKeyBtn');
-  const keyDot = document.getElementById('keyDot');
+  const addForm = document.getElementById('addForm');
+  const titleInput = document.getElementById('titleInput');
+  const linkInput = document.getElementById('linkInput');
   const resultEl = document.getElementById('result');
-  const resultImg = document.getElementById('resultImg');
   const resultTitle = document.getElementById('resultTitle');
   const resultLink = document.getElementById('resultLink');
 
   const WHEEL_COLORS = ['#a8322a', '#c9a24a', '#171210', '#7a5f22', '#8a3a30', '#e8c574'];
 
   let movies = loadMovies();
-  let apiKey = localStorage.getItem(API_KEY_STORAGE) || '';
   let spinning = false;
   let currentRotation = 0;
-
-  apiKeyInput.value = apiKey;
-  updateKeyDot();
 
   function loadMovies(){
     try{
@@ -583,116 +425,22 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(movies));
   }
 
-  function updateKeyDot(){
-    keyDot.classList.toggle('ok', !!apiKey);
-  }
-
-  saveKeyBtn.addEventListener('click', () => {
-    apiKey = apiKeyInput.value.trim();
-    localStorage.setItem(API_KEY_STORAGE, apiKey);
-    updateKeyDot();
-  });
-
-  // ---- Live TMDB search ----
-  let searchDebounce = null;
-  let searchSeq = 0;
-
-  searchInput.addEventListener('input', () => {
-    const q = searchInput.value.trim();
-    clearTimeout(searchDebounce);
-    if(!q){
-      searchResults.classList.remove('show');
-      searchResults.innerHTML = '';
-      return;
-    }
-    if(!apiKey){
-      searchResults.innerHTML = '<div class="no-key-note">Add your TMDB API key above to search the movie database.</div>';
-      searchResults.classList.add('show');
-      return;
-    }
-    searchDebounce = setTimeout(() => runSearch(q), 350);
-  });
-
-  document.addEventListener('click', (e) => {
-    if(!e.target.closest('.search-box')){
-      searchResults.classList.remove('show');
-    }
-  });
-
-  async function runSearch(query){
-    const mySeq = ++searchSeq;
-    try{
-      const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(apiKey)}&query=${encodeURIComponent(query)}&include_adult=false`);
-      if(mySeq !== searchSeq) return; // stale response, newer search superseded it
-      if(!res.ok){
-        searchResults.innerHTML = '<div class="no-key-note">Search failed — check that your API key is correct.</div>';
-        searchResults.classList.add('show');
-        return;
-      }
-      const data = await res.json();
-      renderSearchResults(data.results || []);
-    }catch(e){
-      if(mySeq !== searchSeq) return;
-      searchResults.innerHTML = '<div class="no-key-note">Search failed — check your connection.</div>';
-      searchResults.classList.add('show');
-    }
-  }
-
-  function renderSearchResults(results){
-    if(results.length === 0){
-      searchResults.innerHTML = '<div class="no-key-note">No matches found.</div>';
-      searchResults.classList.add('show');
-      return;
-    }
-    searchResults.innerHTML = '';
-    results.slice(0, 10).forEach(r => {
-      const year = r.release_date ? r.release_date.slice(0,4) : '—';
-      const poster = r.poster_path ? `https://image.tmdb.org/t/p/w92${r.poster_path}` : '';
-      const alreadyAdded = movies.some(m => m.tmdbId === r.id);
-      const row = document.createElement('div');
-      row.className = 'row';
-      row.innerHTML = `
-        ${poster ? `<img src="${poster}" alt="">` : `<div style="width:40px;height:60px;background:#2a251f;border-radius:4px;flex-shrink:0;"></div>`}
-        <div class="meta">
-          <div class="t">${escapeHtml(r.title)}</div>
-          <div class="y">${year}</div>
-        </div>
-        ${alreadyAdded ? '<span class="added">✓ added</span>' : ''}
-      `;
-      if(!alreadyAdded){
-        row.addEventListener('click', () => addMovieFromSearch(r));
-      }
-      searchResults.appendChild(row);
-    });
-    searchResults.classList.add('show');
-  }
-
-  function addMovieFromSearch(r){
-    const movie = {
-      title: r.title,
-      link: `https://www.themoviedb.org/movie/${r.id}`,
-      poster: r.poster_path ? `https://image.tmdb.org/t/p/w342${r.poster_path}` : null,
-      tmdbId: r.id
-    };
-    movies.push(movie);
-    saveMovies();
-    renderList();
-    drawWheel();
-    searchInput.value = '';
-    searchResults.classList.remove('show');
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
   }
 
   function renderList(){
     listEl.innerHTML = '';
     if(movies.length === 0){
-      listEl.innerHTML = '<p style="color:#6b6156; font-style:italic; font-family:Georgia,serif;">No movies yet. Add your first one above.</p>';
+      listEl.innerHTML = '<p class="list-empty">No movies yet. Add your first one above.</p>';
     }
     movies.forEach((m, i) => {
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
-        ${m.poster ? `<img src="${m.poster}" alt="${escapeHtml(m.title)}">` : `<div class="placeholder">${escapeHtml(m.title)}</div>`}
-        <div class="name">${escapeHtml(m.title)}</div>
+        <span class="name">${escapeHtml(m.title)}</span>
         <button class="remove" data-i="${i}" aria-label="Remove ${escapeHtml(m.title)}">×</button>
       `;
       listEl.appendChild(card);
@@ -709,11 +457,19 @@
     spinBtn.disabled = movies.length < 2;
   }
 
-  function escapeHtml(str){
-    const d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
-  }
+  addForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = titleInput.value.trim();
+    const link = linkInput.value.trim();
+    if(!title) return;
+    movies.push({ title, link });
+    saveMovies();
+    renderList();
+    drawWheel();
+    titleInput.value = '';
+    linkInput.value = '';
+    titleInput.focus();
+  });
 
   function polarToCartesian(cx, cy, r, angleDeg){
     const a = (angleDeg - 90) * Math.PI / 180;
@@ -747,7 +503,6 @@
       path.setAttribute('stroke-width', '1.5');
       wheelEl.appendChild(path);
 
-      // label
       const midAngle = startAngle + slice / 2;
       const labelPos = polarToCartesian(cx, cy, r * 0.62, midAngle);
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -773,10 +528,8 @@
     const n = movies.length;
     const slice = 360 / n;
     const winnerIndex = Math.floor(Math.random() * n);
-    // pointer is at top (0deg / 12 o'clock). Wheel slices start at 0deg going clockwise.
-    // We want the winner slice's center to end up at the top after rotation.
     const winnerCenterAngle = winnerIndex * slice + slice / 2;
-    const extraSpins = 5 + Math.floor(Math.random() * 3); // 5-7 full spins
+    const extraSpins = 5 + Math.floor(Math.random() * 3);
     const targetRotation = currentRotation + extraSpins * 360 + (360 - winnerCenterAngle) - (currentRotation % 360);
 
     wheelEl.style.transform = `rotate(${targetRotation}deg)`;
@@ -791,12 +544,6 @@
 
   function showResult(movie){
     resultTitle.textContent = movie.title;
-    if(movie.poster){
-      resultImg.src = movie.poster;
-      resultImg.style.display = 'block';
-    } else {
-      resultImg.style.display = 'none';
-    }
     if(movie.link){
       resultLink.href = movie.link;
       resultLink.style.display = 'inline-block';

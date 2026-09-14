@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reel Roulette — Movie Picker</title>
+<style>
+  @font-face {
+    font-family: 'Marquee';
+  }
+  :root{
+    --bg: #0d0b0a;
+    --bg-warm: #171210;
+    --film: #1c1815;
+    --paper: #f2e9d8;
+    --gold: #c9a24a;
+    --gold-bright: #e8c574;
+    --red: #a8322a;
+    --red-bright: #d1453a;
+    --line: #3a332c;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    background: var(--bg);
+    color: var(--paper);
+    font-family: 'Courier New', Courier, monospace;
+    min-height:100vh;
+  }
+
+  body{
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.35) 0px, rgba(0,0,0,0.35) 2px, transparent 2px, transparent 4px);
+    background-size: 100% 4px;
+  }
+
+  .sprocket-strip{
+    position: fixed;
+    top:0; bottom:0;
+    width: 26px;
+    background: var(--film);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-around;
+    align-items:center;
+    z-index: 5;
+  }
+  .sprocket-strip.left{ left:0; }
+  .sprocket-strip.right{ right:0; }
+  .sprocket-strip span{
+    width:12px; height:16px;
+    background: var(--bg);
+    border-radius:3px;
+    flex-shrink:0;
+    margin: 6px 0;
+  }
+
+  .wrap{
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 48px 80px;
+  }
+
+  @media (max-width: 640px){
+    .wrap{ padding: 36px 20px 60px; }
+    .sprocket-strip{ width:14px; }
+    .sprocket-strip span{ width:7px; height:10px; }
+  }
+
+  header{
+    text-align:center;
+    margin-bottom: 40px;
+  }
+
+  .kicker{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    color: var(--gold);
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    margin: 0 0 6px;
+  }
+
+  h1{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700;
+    font-size: clamp(2.4rem, 7vw, 4rem);
+    margin: 0;
+    color: var(--paper);
+    text-shadow: 0 0 22px rgba(232,197,116,0.18);
+    letter-spacing: 0.01em;
+  }
+
+  h1 em{
+    font-style: normal;
+    color: var(--red-bright);
+  }
+
+  .sub{
+    color: #a89c8a;
+    font-size: 0.95rem;
+    margin-top: 10px;
+  }
+
+  /* ---- Reel / Wheel Section ---- */
+  .reel-stage{
+    position: relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin: 40px 0 32px;
+  }
+
+  .wheel-frame{
+    position: relative;
+    width: min(420px, 86vw);
+    height: min(420px, 86vw);
+  }
+
+  .pointer{
+    position:absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height:0;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-top: 26px solid var(--gold-bright);
+    z-index: 4;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  }
+
+  #wheel{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    border: 6px solid var(--gold);
+    box-shadow:
+      0 0 0 3px var(--bg),
+      0 0 0 6px var(--gold),
+      inset 0 0 30px rgba(0,0,0,0.5),
+      0 10px 40px rgba(0,0,0,0.6);
+    transition: transform 4.5s cubic-bezier(0.15, 0.85, 0.2, 1);
+    background: var(--film);
+  }
+
+  .hub{
+    position:absolute;
+    top:50%; left:50%;
+    transform: translate(-50%,-50%);
+    width: 58px; height:58px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 60%, #7a5f22 100%);
+    border: 3px solid var(--bg);
+    z-index: 3;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  }
+
+  .spin-btn{
+    margin-top: 28px;
+    font-family: Georgia, serif;
+    font-weight:700;
+    font-size: 1.15rem;
+    letter-spacing: 0.06em;
+    color: var(--paper);
+    background: linear-gradient(180deg, var(--red-bright), var(--red));
+    border: none;
+    padding: 16px 46px;
+    border-radius: 999px;
+    cursor:pointer;
+    box-shadow: 0 6px 0 #6e1f19, 0 10px 24px rgba(0,0,0,0.4);
+    transition: transform 0.08s ease;
+  }
+  .spin-btn:active{
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #6e1f19, 0 6px 14px rgba(0,0,0,0.4);
+  }
+  .spin-btn:disabled{
+    opacity:0.5;
+    cursor:not-allowed;
+  }
+
+  .empty-note{
+    text-align:center;
+    color:#8a7d69;
+    font-size:0.9rem;
+    margin-top: 14px;
+    font-style: italic;
+    font-family: Georgia, serif;
+  }
+
+  /* ---- Result Card ---- */
+  .result{
+    display:none;
+    margin: 36px auto 0;
+    max-width: 480px;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow:hidden;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+  }
+  .result.show{ display:flex; }
+  .result img{
+    width: 140px;
+    height: 210px;
+    object-fit: cover;
+    flex-shrink:0;
+    background: #2a251f;
+  }
+  .result-body{
+    padding: 20px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:10px;
+  }
+  .result-label{
+    font-family: Georgia, serif;
+    font-style: italic;
+    color: var(--gold);
+    font-size: 0.85rem;
+    margin:0;
+  }
+  .result-title{
+    font-family: Georgia, serif;
+    font-size: 1.5rem;
+    font-weight:700;
+    margin:0;
+    line-height:1.2;
+  }
+  .result a{
+    color: var(--red-bright);
+    text-decoration:none;
+    font-size: 0.92rem;
+    border-bottom: 1px solid var(--red-bright);
+    align-self:flex-start;
+  }
+  .result a:hover{ color: var(--gold-bright); border-color: var(--gold-bright); }
+
+  /* ---- Divider ---- */
+  .film-divider{
+    height: 22px;
+    margin: 56px 0 30px;
+    background-image: repeating-linear-gradient(90deg, var(--film) 0 10px, transparent 10px 20px);
+    position:relative;
+  }
+  .film-divider::before, .film-divider::after{
+    content:'';
+    position:absolute;
+    left:0; right:0;
+    height:6px;
+    background: var(--bg);
+  }
+  .film-divider::before{ top:0; }
+  .film-divider::after{ bottom:0; }
+
+  /* ---- List Management ---- */
+  section.manage h2{
+    font-family: Georgia, serif;
+    font-size: 1.5rem;
+    margin: 0 0 4px;
+  }
+  section.manage .hint{
+    color:#8a7d69;
+    font-size: 0.88rem;
+    margin: 0 0 22px;
+  }
+  section.manage .hint code{
+    color: var(--gold);
+    background: rgba(201,162,74,0.1);
+    padding: 1px 6px;
+    border-radius:4px;
+  }
+
+  .add-form{
+    display:grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  @media (max-width:640px){
+    .add-form{ grid-template-columns: 1fr; }
+  }
+  .add-form input{
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    color: var(--paper);
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+  }
+  .add-form input:focus{
+    outline:none;
+    border-color: var(--gold);
+  }
+  .add-form button{
+    background: var(--gold);
+    color: #1c1815;
+    border:none;
+    font-weight:700;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor:pointer;
+    font-family: Georgia, serif;
+  }
+  .add-form button:hover{ background: var(--gold-bright); }
+
+  .search-box{
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .search-box input{
+    width:100%;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    color: var(--paper);
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+  }
+  .search-box input:focus{
+    outline:none;
+    border-color: var(--gold);
+  }
+  .search-results{
+    display:none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left:0; right:0;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    max-height: 360px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.5);
+  }
+  .search-results.show{ display:block; }
+  .search-results .row{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    padding: 10px 12px;
+    cursor:pointer;
+    border-bottom: 1px solid var(--line);
+  }
+  .search-results .row:last-child{ border-bottom:none; }
+  .search-results .row:hover{ background: rgba(201,162,74,0.1); }
+  .search-results .row img{
+    width: 40px;
+    height: 60px;
+    object-fit:cover;
+    border-radius: 4px;
+    flex-shrink:0;
+    background: #2a251f;
+  }
+  .search-results .row .meta{
+    flex:1;
+    min-width:0;
+  }
+  .search-results .row .meta .t{
+    font-size: 0.92rem;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .search-results .row .meta .y{
+    font-size: 0.78rem;
+    color:#8a7d69;
+  }
+  .search-results .row .added{
+    font-size: 0.75rem;
+    color: #6bb56b;
+    font-style: italic;
+    flex-shrink:0;
+  }
+  .search-results .no-key-note{
+    padding: 14px;
+    color:#a89c8a;
+    font-size:0.85rem;
+    font-style:italic;
+    font-family: Georgia, serif;
+  }
+
+  .api-key-row{
+    display:flex;
+    gap:10px;
+    margin-bottom: 24px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .api-key-row input{
+    flex:1;
+    min-width: 200px;
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    color: var(--paper);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+  }
+  .api-key-row a{ color: var(--gold); font-size: 0.82rem; }
+  .status-dot{
+    width:9px; height:9px;
+    border-radius:50%;
+    background: #6b6156;
+    flex-shrink:0;
+  }
+  .status-dot.ok{ background: #6bb56b; }
+
+  .list{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 16px;
+  }
+  .card{
+    background: var(--bg-warm);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow:hidden;
+    position:relative;
+  }
+  .card img{
+    width:100%;
+    aspect-ratio: 2/3;
+    object-fit:cover;
+    display:block;
+    background: #2a251f;
+  }
+  .card .placeholder{
+    width:100%;
+    aspect-ratio:2/3;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#6b6156;
+    font-size:0.75rem;
+    text-align:center;
+    padding:8px;
+    font-family: Georgia, serif;
+  }
+  .card .name{
+    padding: 8px 10px 10px;
+    font-size: 0.82rem;
+    line-height:1.3;
+  }
+  .card .remove{
+    position:absolute;
+    top:6px; right:6px;
+    width:24px; height:24px;
+    border-radius:50%;
+    background: rgba(20,15,12,0.85);
+    color: var(--red-bright);
+    border: 1px solid var(--red-bright);
+    cursor:pointer;
+    font-size: 0.9rem;
+    line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .card .remove:hover{ background: var(--red-bright); color: var(--bg); }
+
+  footer{
+    text-align:center;
+    margin-top: 60px;
+    color:#5c5347;
+    font-size: 0.8rem;
+    font-style: italic;
+    font-family: Georgia, serif;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #wheel{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sprocket-strip left" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+</div>
+<div class="sprocket-strip right" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<div class="wrap">
+  <header>
+    <p class="kicker">Tonight's feature, decided by chance</p>
+    <h1>Reel <em>Roulette</em></h1>
+    <p class="sub">Spin the wheel. Whatever it lands on is what you're watching.</p>
+  </header>
+
+  <div class="reel-stage">
+    <div class="wheel-frame">
+      <div class="pointer"></div>
+      <svg id="wheel" viewBox="0 0 400 400"></svg>
+      <div class="hub"></div>
+    </div>
+    <button class="spin-btn" id="spinBtn">Spin the Reel</button>
+    <p class="empty-note" id="emptyNote" style="display:none;">Add a few movies below before you spin.</p>
+  </div>
+
+  <div class="result" id="result">
+    <img id="resultImg" src="" alt="">
+    <div class="result-body">
+      <p class="result-label">Tonight you're watching</p>
+      <p class="result-title" id="resultTitle"></p>
+      <a id="resultLink" href="#" target="_blank" rel="noopener">Open link →</a>
+    </div>
+  </div>
+
+  <div class="film-divider"></div>
+
+  <section class="manage">
+    <h2>Your Watchlist</h2>
+    <p class="hint">
+      Search pulls from the full TMDB movie database — posters included. Get a free key at
+      <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener" style="color:var(--gold)">themoviedb.org</a>
+      (takes a minute, no card needed), paste it below, then search any title.
+    </p>
+
+    <div class="api-key-row">
+      <span class="status-dot" id="keyDot"></span>
+      <input type="text" id="apiKeyInput" placeholder="Paste your TMDB API key (v3 auth) here">
+      <button class="spin-btn" style="margin:0; padding:10px 20px; font-size:0.85rem;" id="saveKeyBtn">Save Key</button>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search the movie database… e.g. Spirited Away" autocomplete="off">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <div class="list" id="list"></div>
+  </section>
+
+  <footer>Est. by you, for movie nights that can't decide.</footer>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'reelRoulette_movies';
+  const API_KEY_STORAGE = 'reelRoulette_tmdbKey';
+
+  const listEl = document.getElementById('list');
+  const wheelEl = document.getElementById('wheel');
+  const spinBtn = document.getElementById('spinBtn');
+  const emptyNote = document.getElementById('emptyNote');
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  const saveKeyBtn = document.getElementById('saveKeyBtn');
+  const keyDot = document.getElementById('keyDot');
+  const resultEl = document.getElementById('result');
+  const resultImg = document.getElementById('resultImg');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultLink = document.getElementById('resultLink');
+
+  const WHEEL_COLORS = ['#a8322a', '#c9a24a', '#171210', '#7a5f22', '#8a3a30', '#e8c574'];
+
+  let movies = loadMovies();
+  let apiKey = localStorage.getItem(API_KEY_STORAGE) || '';
+  let spinning = false;
+  let currentRotation = 0;
+
+  apiKeyInput.value = apiKey;
+  updateKeyDot();
+
+  function loadMovies(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+
+  function saveMovies(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(movies));
+  }
+
+  function updateKeyDot(){
+    keyDot.classList.toggle('ok', !!apiKey);
+  }
+
+  saveKeyBtn.addEventListener('click', () => {
+    apiKey = apiKeyInput.value.trim();
+    localStorage.setItem(API_KEY_STORAGE, apiKey);
+    updateKeyDot();
+  });
+
+  // ---- Live TMDB search ----
+  let searchDebounce = null;
+  let searchSeq = 0;
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim();
+    clearTimeout(searchDebounce);
+    if(!q){
+      searchResults.classList.remove('show');
+      searchResults.innerHTML = '';
+      return;
+    }
+    if(!apiKey){
+      searchResults.innerHTML = '<div class="no-key-note">Add your TMDB API key above to search the movie database.</div>';
+      searchResults.classList.add('show');
+      return;
+    }
+    searchDebounce = setTimeout(() => runSearch(q), 350);
+  });
+
+  document.addEventListener('click', (e) => {
+    if(!e.target.closest('.search-box')){
+      searchResults.classList.remove('show');
+    }
+  });
+
+  async function runSearch(query){
+    const mySeq = ++searchSeq;
+    try{
+      const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(apiKey)}&query=${encodeURIComponent(query)}&include_adult=false`);
+      if(mySeq !== searchSeq) return; // stale response, newer search superseded it
+      if(!res.ok){
+        searchResults.innerHTML = '<div class="no-key-note">Search failed — check that your API key is correct.</div>';
+        searchResults.classList.add('show');
+        return;
+      }
+      const data = await res.json();
+      renderSearchResults(data.results || []);
+    }catch(e){
+      if(mySeq !== searchSeq) return;
+      searchResults.innerHTML = '<div class="no-key-note">Search failed — check your connection.</div>';
+      searchResults.classList.add('show');
+    }
+  }
+
+  function renderSearchResults(results){
+    if(results.length === 0){
+      searchResults.innerHTML = '<div class="no-key-note">No matches found.</div>';
+      searchResults.classList.add('show');
+      return;
+    }
+    searchResults.innerHTML = '';
+    results.slice(0, 10).forEach(r => {
+      const year = r.release_date ? r.release_date.slice(0,4) : '—';
+      const poster = r.poster_path ? `https://image.tmdb.org/t/p/w92${r.poster_path}` : '';
+      const alreadyAdded = movies.some(m => m.tmdbId === r.id);
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `
+        ${poster ? `<img src="${poster}" alt="">` : `<div style="width:40px;height:60px;background:#2a251f;border-radius:4px;flex-shrink:0;"></div>`}
+        <div class="meta">
+          <div class="t">${escapeHtml(r.title)}</div>
+          <div class="y">${year}</div>
+        </div>
+        ${alreadyAdded ? '<span class="added">✓ added</span>' : ''}
+      `;
+      if(!alreadyAdded){
+        row.addEventListener('click', () => addMovieFromSearch(r));
+      }
+      searchResults.appendChild(row);
+    });
+    searchResults.classList.add('show');
+  }
+
+  function addMovieFromSearch(r){
+    const movie = {
+      title: r.title,
+      link: `https://www.themoviedb.org/movie/${r.id}`,
+      poster: r.poster_path ? `https://image.tmdb.org/t/p/w342${r.poster_path}` : null,
+      tmdbId: r.id
+    };
+    movies.push(movie);
+    saveMovies();
+    renderList();
+    drawWheel();
+    searchInput.value = '';
+    searchResults.classList.remove('show');
+  }
+
+  function renderList(){
+    listEl.innerHTML = '';
+    if(movies.length === 0){
+      listEl.innerHTML = '<p style="color:#6b6156; font-style:italic; font-family:Georgia,serif;">No movies yet. Add your first one above.</p>';
+    }
+    movies.forEach((m, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        ${m.poster ? `<img src="${m.poster}" alt="${escapeHtml(m.title)}">` : `<div class="placeholder">${escapeHtml(m.title)}</div>`}
+        <div class="name">${escapeHtml(m.title)}</div>
+        <button class="remove" data-i="${i}" aria-label="Remove ${escapeHtml(m.title)}">×</button>
+      `;
+      listEl.appendChild(card);
+    });
+    document.querySelectorAll('.remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        movies.splice(parseInt(btn.dataset.i), 1);
+        saveMovies();
+        renderList();
+        drawWheel();
+      });
+    });
+    emptyNote.style.display = movies.length < 2 ? 'block' : 'none';
+    spinBtn.disabled = movies.length < 2;
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function polarToCartesian(cx, cy, r, angleDeg){
+    const a = (angleDeg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+  }
+
+  function drawWheel(){
+    wheelEl.innerHTML = '';
+    const n = movies.length;
+    if(n === 0){
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', 200); c.setAttribute('cy', 200); c.setAttribute('r', 198);
+      c.setAttribute('fill', '#1c1815');
+      wheelEl.appendChild(c);
+      return;
+    }
+    const slice = 360 / n;
+    const cx = 200, cy = 200, r = 198;
+
+    movies.forEach((m, i) => {
+      const startAngle = i * slice;
+      const endAngle = startAngle + slice;
+      const p1 = polarToCartesian(cx, cy, r, startAngle);
+      const p2 = polarToCartesian(cx, cy, r, endAngle);
+      const largeArc = slice > 180 ? 1 : 0;
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      const d = `M${cx},${cy} L${p1.x.toFixed(2)},${p1.y.toFixed(2)} A${r},${r} 0 ${largeArc} 1 ${p2.x.toFixed(2)},${p2.y.toFixed(2)} Z`;
+      path.setAttribute('d', d);
+      path.setAttribute('fill', WHEEL_COLORS[i % WHEEL_COLORS.length]);
+      path.setAttribute('stroke', '#0d0b0a');
+      path.setAttribute('stroke-width', '1.5');
+      wheelEl.appendChild(path);
+
+      // label
+      const midAngle = startAngle + slice / 2;
+      const labelPos = polarToCartesian(cx, cy, r * 0.62, midAngle);
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', labelPos.x);
+      text.setAttribute('y', labelPos.y);
+      text.setAttribute('fill', '#f2e9d8');
+      text.setAttribute('font-size', n > 10 ? '9' : n > 6 ? '11' : '13');
+      text.setAttribute('font-family', 'Georgia, serif');
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('transform', `rotate(${midAngle}, ${labelPos.x}, ${labelPos.y})`);
+      let label = m.title.length > 16 ? m.title.slice(0, 14) + '…' : m.title;
+      text.textContent = label;
+      wheelEl.appendChild(text);
+    });
+  }
+
+  spinBtn.addEventListener('click', () => {
+    if(spinning || movies.length < 2) return;
+    spinning = true;
+    spinBtn.disabled = true;
+    resultEl.classList.remove('show');
+
+    const n = movies.length;
+    const slice = 360 / n;
+    const winnerIndex = Math.floor(Math.random() * n);
+    // pointer is at top (0deg / 12 o'clock). Wheel slices start at 0deg going clockwise.
+    // We want the winner slice's center to end up at the top after rotation.
+    const winnerCenterAngle = winnerIndex * slice + slice / 2;
+    const extraSpins = 5 + Math.floor(Math.random() * 3); // 5-7 full spins
+    const targetRotation = currentRotation + extraSpins * 360 + (360 - winnerCenterAngle) - (currentRotation % 360);
+
+    wheelEl.style.transform = `rotate(${targetRotation}deg)`;
+    currentRotation = targetRotation;
+
+    setTimeout(() => {
+      spinning = false;
+      spinBtn.disabled = movies.length < 2;
+      showResult(movies[winnerIndex]);
+    }, 4600);
+  });
+
+  function showResult(movie){
+    resultTitle.textContent = movie.title;
+    if(movie.poster){
+      resultImg.src = movie.poster;
+      resultImg.style.display = 'block';
+    } else {
+      resultImg.style.display = 'none';
+    }
+    if(movie.link){
+      resultLink.href = movie.link;
+      resultLink.style.display = 'inline-block';
+    } else {
+      resultLink.style.display = 'none';
+    }
+    resultEl.classList.add('show');
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // init
+  renderList();
+  drawWheel();
+})();
+</script>
+
+</body>
+</html>
